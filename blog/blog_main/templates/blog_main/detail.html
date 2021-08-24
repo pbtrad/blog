@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Home | {% endblock %}
+{% block title %}{{ post.title }} | {% endblock %}
 
 {% block content %}
 <section class="hero">
@@ -9,9 +9,7 @@
             <section class="section">
                 <div class="columns">
                     <div class="column is-8 is-offset-2">
-                        {% for post in posts %}
                             <div class="content is-medium">
-                                <a href="{% url 'post_detail' post.slug %}">
                                     {% if post.image %}
                                         <figure class="image">
                                             <img src="{{ post.image.url }}">
@@ -21,10 +19,25 @@
                                     <h2 class="subtitle is-4">{{ post.created_at|date:'M-d-Y H:i' }}</h2>
                                     <h2 class="subtitle is-4">{{ post.created_at|timesince }} ago</h2>
                                     <h1 class="title">{{ post.title }}</h1>
-                                    <p>{{ post.intro }}</p>
-                                </a>
+                                    <p><strong>{{ post.intro }}</strong></p>
+
+                                    <p>{{ post.body }}</p>
+
+                                    <hr>
+
+                                    <h2 class="subtitle is-4">Comments</h2>
+
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        {{ form.as_p }}
+
+                                        <div class="field">
+                                            <div class="control">
+                                                <button class="button is-success">Submit Comment</button>
+                                            </div>
+                                        </div>
+                                    </form>
                             </div>
-                        {% endfor %}
                     </div>
                 </div>
             </section>
