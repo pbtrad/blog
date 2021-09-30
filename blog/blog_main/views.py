@@ -1,10 +1,26 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from .forms import CommentForm
-from .models import Post
+from .models import Comment, Post, Category
 
-def detail(request, slug):
-    post = get_object_or_404(Post, slug=slug)
+def detail(request, category_slug, slug):
+    post = get_object_or_404(Post, slug=slug, status=Post.ACTIVE)
 
-    form = CommentForm()
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
 
-    return render(request, 'blog_main/detail.html', {'post': post, 'form': form})
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+
+            return redirect('post_detail', slug=slug)
+    else:
+        form = CommentForm()
+
+    return render(request, 'blog/detail.html', {'post': post, 'form': form})
+
+def category(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    posts = category.posts.filter(status=Post.ACTIVE)
+
+    return render(request, 'blog/category.html', {'category': category, 'posts': posts})
